@@ -1,0 +1,15 @@
+port: "8081"
+debug: true
+
+mysql:
+  user: "mpaa"
+  password: "Zz1234567"
+  ip: "rm-bp1tq0i62719ipf9tmo.mysql.rds.aliyuncs.com"
+  port: "3306"
+  dbname: "tbooks"
+
+redis:
+  addr: "localhost:6379"   # Redis 服务器地址和端口
+  password: ""             # 如果没有设置密码，可以留空
+  db: 0                   # 默认数据库索引，通常是 0
+
