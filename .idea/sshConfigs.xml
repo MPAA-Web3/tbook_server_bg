@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="SshConfigs">
+    <configs>
+      <sshConfig authType="PASSWORD" host="43.242.203.240" id="3fb8b1be-abdf-4f7e-9922-e3cac325f5d6" port="12676" nameFormat="DESCRIPTIVE" username="root" useOpenSSHConfig="false" />
+      <sshConfig host="16.163.21.35" id="0c1b32f4-2c2e-4efe-957b-19656f529c5b" keyPath="$USER_HOME$/Desktop/aws-cdn-hk.pem" port="22" nameFormat="DESCRIPTIVE" username="ubuntu" useOpenSSHConfig="true" />
+    </configs>
+  </component>
+</project>

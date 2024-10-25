@@ -39,7 +39,7 @@ func InitMysql() {
 // CreateMysql 自动化表迁移
 func CreateMysql() error {
 	if err := DB.AutoMigrate(
-		models.User{}); err != nil {
+		models.User{}, models.Invitation{}, models.PhysicalPrize{}, models.Prize{}); err != nil {
 		log.Printf("automigrate table error: %v", err)
 	}
 	return nil

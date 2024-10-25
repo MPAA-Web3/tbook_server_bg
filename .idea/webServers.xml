@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="WebServers">
+    <option name="servers">
+      <webServer id="7c80cf58-a966-4dc4-a253-97c9eb97d5cb" name="ht" url="http://43.242.203.240">
+        <fileTransfer rootFolder="/root" accessType="SFTP" host="43.242.203.240" port="12676" sshConfigId="3fb8b1be-abdf-4f7e-9922-e3cac325f5d6" sshConfig="root@43.242.203.240:12676 password">
+          <advancedOptions>
+            <advancedOptions dataProtectionLevel="Private" keepAliveTimeout="0" passiveMode="true" shareSSLContext="true" isUseRsync="true" />
+          </advancedOptions>
+        </fileTransfer>
+      </webServer>
+      <webServer id="e7f4b94d-1987-4670-b925-e850cb1054f5" name="ton">
+        <fileTransfer rootFolder="/home/ubuntu" accessType="SFTP" host="16.163.21.35" port="22" sshConfigId="0c1b32f4-2c2e-4efe-957b-19656f529c5b" sshConfig="ubuntu@16.163.21.35:22 key" keyPair="true">
+          <advancedOptions>
+            <advancedOptions dataProtectionLevel="Private" keepAliveTimeout="0" passiveMode="true" shareSSLContext="true" isUseRsync="true" />
+          </advancedOptions>
+        </fileTransfer>
+      </webServer>
+    </option>
+  </component>
+</project>
