@@ -48,3 +48,28 @@ type ImgList struct {
 	Name string `json:"name"`
 	Url  string `json:"url"`
 }
+
+type GetTasks struct {
+	Id    int    `json:"id"`
+	Name  string `json:"name"`
+	Url   string `json:"url"`
+	Type  string `json:"type"`
+	State string `json:"state"`
+}
+
+// PrizeList 用于存储奖品列表的信息
+type PrizeList struct {
+	ID          uint    `json:"id"`          // 奖品 ID
+	Name        string  `json:"name"`        // 奖品名称
+	ImageURL    string  `json:"image_url"`   // 奖品图片 URL
+	Type        string  `json:"type"`        // 奖品类型
+	Probability float64 `json:"probability"` //中奖概率
+	Value       string  `json:"value"`       // 奖品的值
+	QuotaStr    string  `json:"quotaStr"`
+}
+
+// TaskList 用于存储任务列表的信息
+type TaskList struct {
+	Name  string `json:"name"`  // 任务名称
+	Value int64  `json:"value"` // 任务的值
+}

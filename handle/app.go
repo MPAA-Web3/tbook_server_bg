@@ -1,9 +1,12 @@
 package handle
 
 import (
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"log"
+	"strconv"
 	"tbook_server_bg/daos"
+	"tbook_server_bg/request"
 	"tbook_server_bg/response"
 )
 
@@ -283,7 +286,7 @@ func GetImgList(c *gin.Context) {
 	for _, or := range imageList {
 
 		imgListResponses = append(imgListResponses, response.ImgList{
-			Name: or.Key,
+			Name: or.Name,
 			Url:  or.Url,
 		})
 	}
@@ -304,27 +307,230 @@ func GetImgList(c *gin.Context) {
 }
 
 // SetPrizeList
-func SetPrizeList(c *gin.Context) {
-	key := c.Query("key") // 获取页码
-	url := c.Query("url") // 获取每页大小
+func SetImgList(c *gin.Context) {
 
-	err := daos.CreateOrUpdateImage(key, url)
+	var setImgList request.SetImgList
+	if err := c.ShouldBindJSON(&setImgList); err != nil {
+		fmt.Println(err.Error())
+		c.JSON(500, gin.H{"code": 1, "msg": "Error req:"})
+		return
+	}
+
+	err := daos.CreateOrUpdateImage(setImgList.Name, setImgList.Url)
 	if err != nil {
 		log.Println("Error creating image:", err)
 		c.JSON(500, gin.H{"code": 1, "msg": "Error creating image:"})
 	}
 
-	c.JSON(200, "true")
+	// 创建返回的简单成功结构
+	response := gin.H{
+		"code": 0,
+		"msg":  "success",
+	}
+
+	c.JSON(200, response)
+
 }
 
 // GetTaskList
 func GetTaskList(c *gin.Context) {
-	page := c.Query("page")         // 获取页码
-	pageSize := c.Query("pageSize") // 获取每页大小
+	// 从数据库获取用户数据
+	taskList, err := daos.GetTaskList()
+	if err != nil {
+		c.JSON(500, gin.H{"code": 1, "msg": "获取Prize数据失败"})
+		return
+	}
+	// 创建一个用于存储响应的任务列表
+	taskListResponses := []response.TaskList{
+		{
+			Name:  "TelegramChannel",
+			Value: taskList.TelegramChannelAmount,
+		},
+		{
+			Name:  "TelegramGroup",
+			Value: taskList.TelegramGroupAmount,
+		},
+		{
+			Name:  "Twitter",
+			Value: taskList.TwitterAmount,
+		},
+		{
+			Name:  "Discord",
+			Value: taskList.DiscordAmount,
+		},
+	}
+
+	// 创建返回的数据结构
+	response := gin.H{
+		"code": 0,
+		"data": gin.H{
+			"list": taskListResponses, // 使用格式化的订单数据
+		},
+		"msg": "success", // 返回消息
+	}
+	// 返回 JSON 响应
+	c.JSON(200, response)
 
 }
 
 // SetTaskList
 func SetTaskList(c *gin.Context) {
+	var setTaskList request.SetTaskList
+	if err := c.ShouldBindJSON(&setTaskList); err != nil {
+		fmt.Println(err.Error())
+		c.JSON(500, gin.H{"code": 1, "msg": "Error req:"})
+		return
+	}
+	// 将 Value 从 string 转换为 int64
+	valueInt64, err := strconv.ParseInt(string(setTaskList.Value), 10, 64)
+	if err != nil {
+		log.Println("Error parsing Value to int64:", err)
+		return // 解析失败时返回，避免后续的数据库操作
+	}
+	err = daos.CreateOrUpdateTaskList(setTaskList.Name, valueInt64)
+	if err != nil {
+		log.Println("Error creating or updating prize:", err)
+		c.JSON(500, gin.H{"code": 1, "msg": "Error creating or updating prize:"})
+		return
+	}
+	// 创建返回的数据结构
+	response := gin.H{
+		"code": 0,
+		"msg":  "success",
+	}
 
+	c.JSON(200, response)
+
+}
+
+// GetPrizeList
+func GetPrizeList(c *gin.Context) {
+	page := c.Query("page")         // 获取页码
+	pageSize := c.Query("pageSize") // 获取每页大小
+
+	// 从数据库获取用户数据
+	prizeList, total, err := daos.GetPrizeList(page, pageSize)
+	if err != nil {
+		c.JSON(500, gin.H{"code": 1, "msg": "获取Prize数据失败"})
+		return
+	}
+
+	// 创建一个用于存储响应的切片
+	var prizeResponses []response.PrizeList
+	for _, or := range prizeList {
+
+		prizeResponses = append(prizeResponses, response.PrizeList{
+			ID:          or.ID,          // 从 prizeList 中获取的奖品 ID，将根据实际数据替换
+			Name:        or.Name,        // 从 prizeList 中获取的奖品名称，将根据实际数据替换
+			ImageURL:    or.ImageURL,    // 从 prizeList 中获取的奖品图片 URL，将根据实际数据替换
+			Type:        or.Type,        // 从 prizeList 中获取的奖品类型，将根据实际数据替换
+			Probability: or.Probability, //中奖概率
+			Value:       or.Value,       // 从 prizeList 中获取的奖品值，将根据实际数据替换
+			QuotaStr:    strconv.FormatInt(or.Quota, 10),
+		})
+	}
+
+	// 创建返回的数据结构
+	response := gin.H{
+		"code": 0,
+		"data": gin.H{
+			"list":     prizeResponses, // 使用格式化的订单数据
+			"page":     page,           // 入参的页码
+			"pageSize": pageSize,       // 入参的每页大小
+			"total":    total,          // 从数据库获取的总数
+		},
+		"msg": "success", // 返回消息
+	}
+	// 返回 JSON 响应
+	c.JSON(200, response)
+
+}
+
+// SetPrizeList
+func SetPrizeList(c *gin.Context) {
+	var setPrizeList request.SetPrizeList
+	if err := c.ShouldBindJSON(&setPrizeList); err != nil {
+		fmt.Println(err.Error())
+		c.JSON(500, gin.H{"code": 1, "msg": "Error req:"})
+		return
+	}
+
+	// 创建或更新奖品信息
+	err := daos.CreateOrUpdatePrize(setPrizeList.ID.String(), setPrizeList.Name, setPrizeList.ImageURL, setPrizeList.PrizeType, setPrizeList.Value, setPrizeList.Probability.String(), setPrizeList.QuotaStr)
+	if err != nil {
+		log.Println("Error creating or updating prize:", err)
+		c.JSON(500, gin.H{"code": 1, "msg": "Error creating or updating prize:"})
+		return
+	}
+	// 创建返回的数据结构
+	response := gin.H{
+		"code": 0,
+		"msg":  "success",
+	}
+
+	c.JSON(200, response)
+
+}
+
+// GetTasks
+func GetTasks(c *gin.Context) {
+	page := c.Query("page")         // 获取页码
+	pageSize := c.Query("pageSize") // 获取每页大小
+
+	// 从数据库获取用户数据
+	getTasks, total, err := daos.GetTasks(page, pageSize)
+	if err != nil {
+		c.JSON(500, gin.H{"code": 1, "msg": "获取用户数据失败"})
+		return
+	}
+
+	// 创建一个用于存储响应的切片
+	var getTasksResponses []response.GetTasks
+	for _, or := range getTasks {
+
+		getTasksResponses = append(getTasksResponses, response.GetTasks{
+			Name:  or.Name,
+			Url:   or.Url,
+			Type:  or.Type,
+			Id:    int(or.ID),
+			State: or.State,
+		})
+	}
+
+	// 创建返回的数据结构
+	response := gin.H{
+		"code": 0,
+		"data": gin.H{
+			"list":     getTasksResponses, // 使用格式化的订单数据
+			"page":     page,              // 入参的页码
+			"pageSize": pageSize,          // 入参的每页大小
+			"total":    total,             // 从数据库获取的总数
+		},
+		"msg": "success", // 返回消息
+	}
+	// 返回 JSON 响应
+	c.JSON(200, response)
+}
+
+// SetTasks
+func SetTasks(c *gin.Context) {
+	var setTasks request.SetTasks
+	if err := c.ShouldBindJSON(&setTasks); err != nil {
+		fmt.Println(err.Error())
+		c.JSON(500, gin.H{"code": 1, "msg": "Error req:"})
+		return
+	}
+	err := daos.CreateOrUpdateSetTasks(setTasks.ID, setTasks.Name, setTasks.Url, setTasks.Type, setTasks.State)
+	if err != nil {
+		log.Println("Error creating image:", err)
+		c.JSON(500, gin.H{"code": 1, "msg": "Error creating image:"})
+	}
+
+	// 创建返回的简单成功结构
+	response := gin.H{
+		"code": 0,
+		"msg":  "success",
+	}
+
+	c.JSON(200, response)
 }

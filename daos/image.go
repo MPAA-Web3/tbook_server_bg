@@ -1,6 +1,8 @@
 package daos
 
 import (
+	"errors"
+	"fmt"
 	"gorm.io/gorm"
 	"strconv"
 	"tbook_server_bg/models"
@@ -33,31 +35,34 @@ func GetImgList(page string, pageSize string) ([]models.Image, int, error) {
 	return image, int(total), nil
 }
 
-// 添加image
+// 添加或更新 image 记录
 func CreateOrUpdateImage(key string, url string) error {
 	var existingImage models.Image
 
-	// 查找是否已有相同 Key 的记录
-	err := DB.Where("key = ?", key).First(&existingImage).Error
+	err := DB.Where("name  = ?", key).First(&existingImage).Error
 	if err != nil {
 		// 如果没有找到匹配项 (ErrRecordNotFound)，创建新的记录
-		if err == gorm.ErrRecordNotFound {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
 			newImage := models.Image{
-				Key: key,
-				Url: url,
+				Name: key,
+				Url:  url,
 			}
 			if err := DB.Create(&newImage).Error; err != nil {
-				return err
+				fmt.Println("Error creating new image:", err) // 输出详细错误
+				return fmt.Errorf("error creating image: %w", err)
 			}
 		} else {
 			// 其他数据库错误
-			return err
+			fmt.Println("Database error:", err)
+			return fmt.Errorf("database error: %w", err)
 		}
 	} else {
 		// 如果找到匹配项，更新记录的 URL
 		existingImage.Url = url
+		existingImage.Name = key
 		if err := DB.Save(&existingImage).Error; err != nil {
-			return err
+			fmt.Println("Error updating image:", err) // 输出详细错误
+			return fmt.Errorf("error updating image: %w", err)
 		}
 	}
 

@@ -35,18 +35,20 @@ func route(r *gin.Engine) {
 	// 不鉴权接口
 	public := r.Group("/api/v1")
 	{
-		public.GET("/ping", handle.GetPing)          // 不鉴权的测试接口 ✅
-		public.GET("/getUser", handle.GetUser)       //获取用户
-		public.GET("/getTask", handle.GetTask)       //获取任务
-		public.GET("/getRewards", handle.GetRewards) //获取奖品列表
-		public.GET("/getInvitee", handle.Invitee)    //获取邀请列表invitee ❌
-		public.GET("/getCard", handle.Card)          //获取卡片Cards抽奖次数 积分换抽奖次数
-		public.GET("/getSwap", handle.GetSwap)       //获取Swap ton换积分
-		public.GET("")                               //奖品配置
-		//新增修改奖品
-		public.GET("/getTaskList", handle.GetTaskList)    // 获取任务列表
-		public.POST("/setTaskList", handle.SetTaskList)   // 配置任务列表
-		public.GET("/getImgList", handle.GetImgList)      //获取图片列表✅
-		public.POST("/setPrizeList", handle.SetPrizeList) //配置图片列表✅
+		public.GET("/ping", handle.GetPing)               // 不鉴权的测试接口 ✅
+		public.GET("/getUser", handle.GetUser)            // 获取用户
+		public.GET("/getTask", handle.GetTask)            // 获取任务
+		public.GET("/getRewards", handle.GetRewards)      // 获取奖品列表
+		public.GET("/getInvitee", handle.Invitee)         // 获取邀请列表invitee ❌
+		public.GET("/getCard", handle.Card)               // 获取卡片Cards抽奖次数 积分换抽奖次数
+		public.GET("/getSwap", handle.GetSwap)            // 获取Swap ton换积分
+		public.GET("/getPrizeList", handle.GetPrizeList)  // 获取奖品配置列表✅
+		public.POST("/setPrizeList", handle.SetPrizeList) // 新增或修改奖品配置✅
+		public.GET("/getTaskType", handle.GetTaskList)    // 获取任务列表✅
+		public.POST("/setTaskType", handle.SetTaskList)   // 配置任务列表✅
+		public.GET("/getImgList", handle.GetImgList)      // 获取图片列表✅
+		public.POST("/setImgList", handle.SetImgList)     // 配置图片列表✅
+		public.GET("/getTaskList", handle.GetTasks)
+		public.POST("/setTaskList", handle.SetTasks)
 	}
 }
